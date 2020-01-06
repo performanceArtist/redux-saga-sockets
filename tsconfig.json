@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./@types"],
+    "traceResolution": false,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "lib": [
+      "es2015",
+      "es2017",
+      "es6",
+      "es7",
+      "es5",
+      "dom",
+      "scripthost",
+      "esnext"
+    ],
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "importHelpers": true,
+    "strictPropertyInitialization": true,
+    "strictFunctionTypes": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
