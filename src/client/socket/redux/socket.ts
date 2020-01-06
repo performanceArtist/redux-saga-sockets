@@ -27,9 +27,12 @@ type Converter<T> = (message: T) => { type: string, payload?: any };
 
 class Socket<T> {
   private socket!: AnySocket<T>;
-  constructor(private converter?: Converter<T>, private connectionTimeout = 3000) {}
+  private converter!: Converter<T>;
 
-  public addConverter(converter: Converter<T>) {
+  constructor(private connectionTimeout = 3000) {}
+
+  public init(socket: AnySocket<T>, converter: Converter<T>) {
+    this.socket = socket;
     this.converter = converter;
   }
 

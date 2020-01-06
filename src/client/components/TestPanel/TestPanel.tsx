@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { autobind } from 'core-decorators';
 
 import { actions, namespace } from '../../socket';
-import { initIO, initWebsocket } from '../../config';
+import { startIO, startWebsocket } from '../../startSocket';
 
 type Props = typeof mapDispatch & ReturnType<typeof mapState>;
 type State = {
@@ -26,7 +26,7 @@ class TestPanel extends React.Component<Props, State> {
   private handleModeSwitch(event: React.ChangeEvent) {
     const target = event.target as HTMLInputElement;
     this.setState({ mode: target.value as any });
-    target.value === 'websocket' ? initWebsocket() : initIO();
+    target.value === 'websocket' ? startWebsocket() : startIO();
   }
 
   render() {
@@ -53,7 +53,7 @@ class TestPanel extends React.Component<Props, State> {
           />
         </div>
         <button type="button" onClick={() => {
-          this.state.mode === 'websocket' ? initWebsocket() : initIO();
+          this.state.mode === 'websocket' ? startWebsocket() : startIO();
           startChannel();
         }}>Start channel</button>
         <button type="button" onClick={() => stopChannel()}>Stop channel</button>

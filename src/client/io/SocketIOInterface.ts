@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 
-import { AnySocket } from './socket';
+import { AnySocket } from '../socket';
 
 class SocketIOInterface implements AnySocket<any> {
   private socket!: SocketIOClient.Socket;

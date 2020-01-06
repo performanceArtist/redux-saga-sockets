@@ -1,4 +1,4 @@
-import { AnySocket } from './socket';
+import { AnySocket } from '../socket';
 import { ReconnectableWebsocket } from './ReconnectableWebsocket';
 
 class WebSocketInterface implements AnySocket<MessageEvent> {

@@ -1,4 +1,4 @@
-#redux-saga-sockets
+# redux-saga-sockets
 
 Socket interface with redux-saga + Websocket and Socket.io implementations + IO and Websocket servers for testing.
 
