@@ -22,4 +22,3 @@ type ActionTypes<T extends ActionCreators> = ReturnType<T[keyof T]>;
 
 export const actions = { channelOn, channelOff, serverOn, serverOff, startChannel, stopChannel };
 export type Actions = ActionTypes<typeof actions>;
-export type PickByType<K extends Actions['type']> = Extract<Actions, { type: K }>;
