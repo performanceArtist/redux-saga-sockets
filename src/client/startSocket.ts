@@ -1,16 +1,16 @@
 import { socket } from './saga';
 import { SocketIOInterface } from './io';
 import { WebSocketInterface } from './websocket';
+import { actions } from './features/Messages/redux';
+
+const { websocketMessage, ioMessage } = actions;
 
 export function initWebsocket(url: string) {
   const websocket = new WebSocketInterface(url);
   const websocketMessageToAction = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
 
-    return {
-      type: 'WEBSOCKET:MESSAGE',
-      payload: data
-    };
+    return websocketMessage(data.message);
   };
 
   socket.init(websocket, websocketMessageToAction);
@@ -19,10 +19,7 @@ export function initWebsocket(url: string) {
 export function initIO(url: string) {
   const io = new SocketIOInterface(url);
   const IOMessageToAction = (data: any) => {
-    return {
-      type: 'IO:MESSAGE',
-      payload: data
-    };
+    return ioMessage(data.message);
   };
 
   socket.init(io, IOMessageToAction)

@@ -1,0 +1,19 @@
+.app {
+  &__title {
+    padding-left: 1rem;
+  }
+
+  &__content {
+    display: flex;
+  }
+
+  &__controls {
+    max-width: 32rem;
+    margin-right: 2rem;
+  }
+
+  &__test-panel {
+    padding: 1rem;
+    padding-top: 0;
+  }
+}
