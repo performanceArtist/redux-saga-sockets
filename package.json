@@ -12,7 +12,7 @@
     "server-websocket:dev": "ts-node-dev ./src/server/websocket.ts",
     "server:dev": "concurrently -n \"SOCKET.IO,WEBSOCKET\" -c \"green,red\" \"npm run server-io:dev\" \"npm run server-websocket:dev\"",
     "client:dev": "webpack-dev-server --hot --mode=development --config webpack.config.dev.ts",
-    "build": "tsc --project ./",
+    "client:build": "webpack --mode=production --config webpack.config.prod.ts",
     "start": "NODE_ENV=production node dist/server.js"
   },
   "author": "",

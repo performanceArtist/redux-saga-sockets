@@ -32,6 +32,7 @@ class Socket<T> {
   constructor(private connectionTimeout = 3000) {}
 
   public init(socket: AnySocket<T>, converter: Converter<T>) {
+    this.socket && this.socket.disconnect();
     this.socket = socket;
     this.converter = converter;
   }

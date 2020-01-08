@@ -16,6 +16,7 @@ class ReconnectableWebsocket extends EventEmitter {
 
   disconnect() {
     this.websocket.close();
+    this.clearInterval();
   }
 
   unsubscribeMessageHandler() {
@@ -52,6 +53,7 @@ class ReconnectableWebsocket extends EventEmitter {
 
     this.websocket.addEventListener('close', event => {
       if (event.code === 1000) {
+        this.clearInterval();
         this.websocket.close();
       } else {
         this.reconnect();
@@ -64,13 +66,17 @@ class ReconnectableWebsocket extends EventEmitter {
         : this.emit('connect', event);
 
       this.connected = true;
-      this.reconnectInterval && clearInterval(this.reconnectInterval);
-      this.reconnectInterval = null;
+      this.clearInterval();
 
       this.websocket.addEventListener('message', event => {
         this.emit('message', event);
       });
     });
+  }
+
+  private clearInterval() {
+    this.reconnectInterval && clearInterval(this.reconnectInterval);
+    this.reconnectInterval = null;
   }
 
   private reconnect() {
