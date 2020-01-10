@@ -15,6 +15,7 @@ import { actions } from './actions';
 const { serverOn, serverOff, channelOn, channelOff } = actions;
 
 type EventHandler = (callback: () => void) => void;
+export type Converter<T> = (message: T) => { type: string, payload?: any };
 export type AnySocket<T> = {
   onConnect: EventHandler;
   onDisconnect: EventHandler;
@@ -22,19 +23,17 @@ export type AnySocket<T> = {
   disconnect: () => void;
   subscribe: (handler: (message: T) => void) => void;
   unsubscribe: (handler?: (message: T) => void) => void;
+  converter: Converter<T>;
 };
-type Converter<T> = (message: T) => { type: string, payload?: any };
 
 class Socket<T> {
   private socket!: AnySocket<T>;
-  private converter!: Converter<T>;
 
   constructor(private connectionTimeout = 3000) {}
 
-  public init(socket: AnySocket<T>, converter: Converter<T>) {
+  public init(socket: AnySocket<T>) {
     this.socket && this.socket.disconnect();
     this.socket = socket;
-    this.converter = converter;
   }
 
   public addSocketInterface(socket: AnySocket<T>) {
@@ -65,7 +64,7 @@ class Socket<T> {
   @autobind
   private createChannel() {
     return eventChannel(emit => {
-      const handler = (data: any) => emit(this.converter!(data));
+      const handler = (data: any) => emit(this.socket.converter!(data));
 
       this.socket.subscribe(handler);
 

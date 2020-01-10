@@ -53,8 +53,7 @@ class ReconnectableWebsocket extends EventEmitter {
 
     this.websocket.addEventListener('close', event => {
       if (event.code === 1000) {
-        this.clearInterval();
-        this.websocket.close();
+        this.disconnect();
       } else {
         this.reconnect();
       }

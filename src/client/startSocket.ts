@@ -1,28 +1,17 @@
 import { socket } from './saga';
-import { SocketIOInterface } from './io';
-import { WebSocketInterface } from './websocket';
-import { actions } from './features/Messages/redux';
-
-const { websocketMessage, ioMessage } = actions;
+import { SocketIOInterface, IOMessageToAction } from './io';
+import { WebSocketInterface, websocketMessageToAction } from './websocket';
 
 export function initWebsocket(url: string) {
-  const websocket = new WebSocketInterface(url);
-  const websocketMessageToAction = (event: MessageEvent) => {
-    const data = JSON.parse(event.data);
+  const websocket = new WebSocketInterface(url, websocketMessageToAction);
 
-    return websocketMessage(data.message);
-  };
-
-  socket.init(websocket, websocketMessageToAction);
+  socket.init(websocket);
 }
 
 export function initIO(url: string) {
-  const io = new SocketIOInterface(url);
-  const IOMessageToAction = (data: any) => {
-    return ioMessage(data.message);
-  };
+  const io = new SocketIOInterface(url, IOMessageToAction);
 
-  socket.init(io, IOMessageToAction)
+  socket.init(io)
 }
 
 export const startWebsocket = () => initWebsocket('ws://localhost:5000');

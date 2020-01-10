@@ -1,10 +1,10 @@
-import { AnySocket } from '../socket';
+import { AnySocket, Converter } from '../socket';
 import { ReconnectableWebsocket } from './ReconnectableWebsocket';
 
 class WebSocketInterface implements AnySocket<MessageEvent> {
   private websocket: ReconnectableWebsocket;
 
-  constructor(private url: string) {
+  constructor(private url: string, public converter: Converter<MessageEvent>) {
     this.websocket = new ReconnectableWebsocket(this.url);
   }
 

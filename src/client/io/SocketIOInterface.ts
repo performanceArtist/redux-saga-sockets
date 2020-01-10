@@ -1,11 +1,11 @@
 import io from 'socket.io-client';
 
-import { AnySocket } from '../socket';
+import { AnySocket, Converter } from '../socket';
 
 class SocketIOInterface implements AnySocket<any> {
   private socket!: SocketIOClient.Socket;
 
-  constructor(private url: string) {}
+  constructor(private url: string, public converter: Converter<any>) {}
 
   public onConnect(resolve: () => void) {
     this.socket = io(this.url);
