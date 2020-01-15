@@ -1,11 +1,14 @@
 import { all } from 'redux-saga/effects';
 
 import { Socket } from './socket';
+import { SocketSaga } from './reduxSocket';
 
-const socket = new Socket();
+export const socket = new Socket<{ message: string }>();
+
+const saga = new SocketSaga(socket);
 
 function* rootSaga() {
-  yield all([socket.listen()])
+  yield all([saga.listen()])
 }
 
-export { rootSaga, socket };
+export { rootSaga };

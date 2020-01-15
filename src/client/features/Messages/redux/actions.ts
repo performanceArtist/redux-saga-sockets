@@ -1,11 +1,11 @@
-export const ioMessage = (data: any) => ({
+export const ioMessage = (message: string) => ({
   type: 'IO:MESSAGE',
-  payload: data
+  payload: message
 } as const);
 
-export const websocketMessage = (data: any) => ({
+export const websocketMessage = (message: string) => ({
   type: 'WEBSOCKET:MESSAGE',
-  payload: data
+  payload: message
 } as const);
 
 type GetActionTypes<T extends Record<string, (...args: any) => any>> = ReturnType<T[keyof T]>;

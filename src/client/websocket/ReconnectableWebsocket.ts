@@ -15,8 +15,8 @@ class ReconnectableWebsocket extends EventEmitter {
   }
 
   disconnect() {
-    this.websocket.close();
     this.clearInterval();
+    this.websocket.close();
   }
 
   unsubscribeMessageHandler() {
@@ -27,7 +27,7 @@ class ReconnectableWebsocket extends EventEmitter {
     this.on('connect', callback);
   }
 
-  onMessage(callback: (event?: MessageEvent) => void) {
+  onMessage(callback: (event: MessageEvent) => void) {
     this.onMessageCallback = callback;
     this.on('message', callback);
   }
@@ -65,10 +65,11 @@ class ReconnectableWebsocket extends EventEmitter {
         : this.emit('connect', event);
 
       this.connected = true;
-      this.clearInterval();
+      this.reconnectInterval && clearInterval(this.reconnectInterval);
+      this.reconnectInterval = null;
 
-      this.websocket.addEventListener('message', event => {
-        this.emit('message', event);
+      this.websocket.addEventListener('message', messageEvent => {
+        this.emit('message', messageEvent);
       });
     });
   }

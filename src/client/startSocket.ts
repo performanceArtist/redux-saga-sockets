@@ -1,17 +1,22 @@
+import { actions } from './features/Messages/redux';
+import { SocketIOInterface } from './io';
+import { WebSocketInterface } from './websocket';
 import { socket } from './saga';
-import { SocketIOInterface, IOMessageToAction } from './io';
-import { WebSocketInterface, websocketMessageToAction } from './websocket';
 
 export function initWebsocket(url: string) {
-  const websocket = new WebSocketInterface(url, websocketMessageToAction);
+  const websocket = new WebSocketInterface<{ message: string }>(url);
 
   socket.init(websocket);
+  socket.subscribe(({ message }) => actions.websocketMessage(message));
+  socket.connect();
 }
 
 export function initIO(url: string) {
-  const io = new SocketIOInterface(url, IOMessageToAction);
+  const io = new SocketIOInterface<{ message: string }>(url);
 
-  socket.init(io)
+  socket.init(io);
+  socket.connect();
+  socket.subscribe(({ message }) => actions.ioMessage(message));
 }
 
 export const startWebsocket = () => initWebsocket('ws://localhost:5000');

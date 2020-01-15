@@ -1,7 +1,7 @@
 import { createStore, compose, applyMiddleware, combineReducers } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 
-import { reducer as socketReducer, namespace as socketNamespace } from './socket';
+import { reducer as socketReducer, namespace as socketNamespace } from './reduxSocket';
 import { reducer as messageReducer, namespace as messageNamespace } from './features/Messages';
 import { rootSaga } from './saga';
 

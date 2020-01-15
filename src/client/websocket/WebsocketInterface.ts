@@ -1,10 +1,10 @@
-import { AnySocket, Converter } from '../socket';
+import { AnySocket } from '../socket';
 import { ReconnectableWebsocket } from './ReconnectableWebsocket';
 
-class WebSocketInterface implements AnySocket<MessageEvent> {
+class WebSocketInterface<T> implements AnySocket<T> {
   private websocket: ReconnectableWebsocket;
 
-  constructor(private url: string, public converter: Converter<MessageEvent>) {
+  constructor(private url: string, private converter?: (data: any) => T) {
     this.websocket = new ReconnectableWebsocket(this.url);
   }
 
@@ -21,8 +21,15 @@ class WebSocketInterface implements AnySocket<MessageEvent> {
     this.websocket.onReconnect(resolve);
   }
 
-  public subscribe(handler: (message: MessageEvent) => void) {
-    this.websocket.onMessage(handler);
+  public subscribe(handler: (data: T) => void) {
+    this.websocket.onMessage(
+      event => {
+        const data = JSON.parse(event.data);
+        this.converter
+          ? handler(this.converter(data))
+          : handler(data);
+      }
+    );
   }
 
   public unsubscribe() {

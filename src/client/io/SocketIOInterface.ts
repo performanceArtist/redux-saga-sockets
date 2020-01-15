@@ -1,11 +1,11 @@
 import io from 'socket.io-client';
 
-import { AnySocket, Converter } from '../socket';
+import { AnySocket } from '../socket';
 
-class SocketIOInterface implements AnySocket<any> {
+class SocketIOInterface<T> implements AnySocket<T> {
   private socket!: SocketIOClient.Socket;
 
-  constructor(private url: string, public converter: Converter<any>) {}
+  constructor(private url: string, private converter?: (data: any) => T) {}
 
   public onConnect(resolve: () => void) {
     this.socket = io(this.url);
@@ -20,11 +20,15 @@ class SocketIOInterface implements AnySocket<any> {
     this.socket.on('disconnect', resolve);
   }
 
-  public subscribe(handler: (message: any) => void) {
-    this.socket.on('message', handler);
+  public subscribe(handler: (message: T) => void) {
+    this.socket.on('message', (data: any) => {
+      this.converter
+        ? handler(this.converter(data))
+        : handler(data);
+    });
   }
 
-  public unsubscribe(handler: (message: MessageEvent) => void) {
+  public unsubscribe(handler: (message: T) => void) {
     this.socket.off('message', handler);
   }
 
