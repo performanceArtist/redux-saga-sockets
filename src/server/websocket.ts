@@ -18,6 +18,8 @@ websocketServer.on('connection', (socket: WebSocket) => {
 
   setInterval(() => {
     socket.send(JSON.stringify({ message: new Date().getTime() }));
+    socket.send(JSON.stringify({ type: 'one', message: `Type one: ${new Date().getTime()}` }));
+    socket.send(JSON.stringify({ type: 'two', message: `Type two: ${new Date().getTime()}` }));
   }, MESSAGE_TIMEOUT);
 
 });

@@ -13,7 +13,8 @@
     "server:dev": "concurrently -n \"SOCKET.IO,WEBSOCKET\" -c \"green,red\" \"npm run server-io:dev\" \"npm run server-websocket:dev\"",
     "client:dev": "webpack-dev-server --hot --mode=development --config webpack.config.dev.ts",
     "client:build": "webpack --mode=production --config webpack.config.prod.ts",
-    "start": "NODE_ENV=production node dist/server.js"
+    "start": "NODE_ENV=production node dist/server.js",
+    "check-types": "tsc -p . --noEmit"
   },
   "author": "",
   "license": "ISC",

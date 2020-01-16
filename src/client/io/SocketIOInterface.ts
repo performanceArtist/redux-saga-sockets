@@ -1,15 +1,23 @@
+import EventEmitter from 'events';
 import io from 'socket.io-client';
+import { autobind } from 'core-decorators';
 
 import { AnySocket } from '../socket';
 
-class SocketIOInterface<T> implements AnySocket<T> {
+class SocketIOInterface<T, C extends string = never> implements AnySocket<T, C> {
   private socket!: SocketIOClient.Socket;
+  private emitter = new EventEmitter();
 
   constructor(private url: string, private converter?: (data: any) => T) {}
 
   public onConnect(resolve: () => void) {
     this.socket = io(this.url);
     this.socket.on('connect', resolve);
+  }
+
+  @autobind
+  public onMessage(handler: any) {
+    this.emitter.on('message', handler);
   }
 
   public onReconnect(resolve: () => void) {
@@ -20,11 +28,13 @@ class SocketIOInterface<T> implements AnySocket<T> {
     this.socket.on('disconnect', resolve);
   }
 
-  public subscribe(handler: (message: T) => void) {
-    this.socket.on('message', (data: any) => {
-      this.converter
+  public subscribe(handler: (message: T) => void, channel?: C) {
+    this.socket.on(channel || 'message', (data: any) => {
+      const converted = this.converter
         ? handler(this.converter(data))
         : handler(data);
+
+      this.emitter.emit('message', converted);
     });
   }
 

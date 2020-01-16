@@ -11,6 +11,8 @@ io.on('connection', client => {
   console.log('New client');
   setInterval(() => {
     client.emit('message', { message: new Date().getTime() });
+    client.emit('one', { message: `Type one: ${new Date().getTime()}` });
+    client.emit('two', { message: `Type two: ${new Date().getTime()}` });
   }, MESSAGE_TIMEOUT);
 });
 

@@ -20,25 +20,9 @@ class SocketSaga {
   @autobind
   private createMessageChannel() {
     return eventChannel(emit => {
-      const handler = (data: any) => {
-        this.socket.subscribers.forEach(({ action, channel }) => {
-          const newAction = action(data);
-          if (!newAction) {
-            return;
-          }
-
-          if (this.socket.pickChannel && channel) {
-            this.socket.pickChannel(data, channel) && emit(action);
-          } else {
-            emit(newAction);
-          }
-        });
-      }
-
-      this.socket.initHandler(handler);
-
+      this.socket.onMessage && this.socket.onMessage(emit);
       return () => {
-        this.socket.unsubscribe(handler);
+        //this.socket.unsubscribe();
       };
     });
   }
