@@ -15,14 +15,12 @@ export type AnySocket<T, C> = {
 
 export type ToAction<T> = (data: T) => any;
 
-class Socket<T, C = never> extends EventEmitter {
+class Socket<T, C = never> {
   private socket!: AnySocket<T, C>;
+  private serverStatusEmitter = new EventEmitter();
+  private lastServerStatus: 'on' | 'off' = 'off';
   public onMessage?: AnySocket<T, C>['onMessage'];
   public offMessage?: AnySocket<T, C>['offMessage'];
-
-  constructor() {
-    super();
-  }
 
   public init(socket: AnySocket<T, C>) {
     this.socket && this.socket.disconnect();
@@ -51,16 +49,33 @@ class Socket<T, C = never> extends EventEmitter {
     }
   }
 
+  public onServerStatusChange(callback: (status: 'on' | 'off') => void) {
+    this.serverStatusEmitter.on('serverStatusUpdate', callback);
+  }
+
+  public offServerStatusChange(callback: (status: 'on' | 'off') => void) {
+    this.serverStatusEmitter.off('serverStatusUpdate', callback);
+  }
+
+  private sendServerStatusUpdate(status: 'on' | 'off') {
+    if (this.lastServerStatus === status) {
+      return;
+    }
+
+    this.lastServerStatus = status;
+    this.serverStatusEmitter.emit('serverStatusUpdate', status);
+  }
+
   @autobind
   public connect() {
     this.socket.onConnect(() => {
-      this.emit('serverStatusUpdate', 'on');
+      this.sendServerStatusUpdate('on');
     });
     this.socket.onDisconnect(() => {
-      this.emit('serverStatusUpdate', 'off');
+      this.sendServerStatusUpdate('off');
     });
     this.socket.onReconnect(() => {
-      this.emit('serverStatusUpdate', 'on');
+      this.sendServerStatusUpdate('on');
     });
   }
 

@@ -5,14 +5,13 @@ import {
   call,
   fork,
   put,
-  race,
-  cancelled,
+  race
 } from 'redux-saga/effects';
 
 import { Socket } from '../../socket';
 import { actions } from './actions';
 
-const { serverOn, serverOff, channelOn, channelOff } = actions;
+const { serverOn, serverOff } = actions;
 
 class SocketSaga {
   constructor(private socket: Socket<any, any>) {}
@@ -22,7 +21,7 @@ class SocketSaga {
     return eventChannel(emit => {
       this.socket.onMessage && this.socket.onMessage(emit);
       return () => {
-        //this.socket.unsubscribe();
+        this.socket.offMessage && this.socket.offMessage(emit);
       };
     });
   }
@@ -38,10 +37,10 @@ class SocketSaga {
         emit(action);
       };
 
-      this.socket.on('serverStatusUpdate', handler);
+      this.socket.onServerStatusChange(handler);
 
       return () => {
-        this.socket.off('serverStatusUpdate', handler)
+        this.socket.offServerStatusChange(handler);
       }
     });
   }
@@ -57,19 +56,14 @@ class SocketSaga {
   @autobind
   private* listenServerSaga() {
     try {
-      yield put(channelOn());
       const serverChannel = yield call(this.createServerChannel);
       const messageChannel = yield call(this.createMessageChannel);
 
       yield fork(this.channelListen, serverChannel);
       yield fork(this.channelListen, messageChannel);
     } catch (error) {
+      this.socket.disconnect();
       console.log(error); // eslint-disable-line
-    } finally {
-      if (yield cancelled()) {
-        this.socket.disconnect();
-        yield put(channelOff());
-      }
     }
   }
 

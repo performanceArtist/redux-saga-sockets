@@ -6,18 +6,24 @@ import { AnySocket } from '../socket';
 
 class SocketIOInterface<T, C extends string = never> implements AnySocket<T, C> {
   private socket!: SocketIOClient.Socket;
-  private emitter = new EventEmitter();
+  private messsageEmitter = new EventEmitter();
 
-  constructor(private url: string, private converter?: (data: any) => T) {}
+  constructor(private url: string, private converter?: (data: any) => T) {
+    this.socket = io(this.url);
+  }
 
   public onConnect(resolve: () => void) {
-    this.socket = io(this.url);
     this.socket.on('connect', resolve);
   }
 
   @autobind
   public onMessage(handler: any) {
-    this.emitter.on('message', handler);
+    this.messsageEmitter.on('message', handler);
+  }
+
+  @autobind
+  public offMessage(handler: any) {
+    this.messsageEmitter.off('message', handler);
   }
 
   public onReconnect(resolve: () => void) {
@@ -29,12 +35,12 @@ class SocketIOInterface<T, C extends string = never> implements AnySocket<T, C> 
   }
 
   public subscribe(handler: (message: T) => void, channel?: C) {
-    this.socket.on(channel || 'message', (data: any) => {
+    this.socket.on(channel || '*', (data: any) => {
       const converted = this.converter
         ? handler(this.converter(data))
         : handler(data);
 
-      this.emitter.emit('message', converted);
+      this.messsageEmitter.emit('message', converted);
     });
   }
 

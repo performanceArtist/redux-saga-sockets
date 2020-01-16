@@ -13,17 +13,21 @@ type Subscriber<T, C> = {
   channel?: C;
 };
 
+type Options<T, C> = {
+  url: string;
+  converter?: (data: any) => T;
+  pickChannel?: PickChannel<T, C>
+}
+
 class WebSocketInterface<T, C = never> implements AnySocket<T, C> {
   private websocket: ReconnectableWebsocket;
   private subscribers: Subscriber<T, C>[] = [];
   private messageEmitter = new EventEmitter();
 
-  constructor(
-    private url: string,
-    private converter?: (data: MessageEvent) => T,
-    public pickChannel?: PickChannel<T, C>
-  ) {
-    this.websocket = new ReconnectableWebsocket(this.url);
+  constructor(private options: Options<T, C>) {
+    const { url } = this.options;
+
+    this.websocket = new ReconnectableWebsocket(url);
   }
 
   @autobind
@@ -37,14 +41,18 @@ class WebSocketInterface<T, C = never> implements AnySocket<T, C> {
   }
 
   public onConnect(resolve: () => void) {
+    const { converter, pickChannel } = this.options;
+
     this.websocket.onConnect(resolve);
     this.websocket.connect();
     this.websocket.onMessage(
       event => {
-        const converted = this.converter ? this.converter(event) : JSON.parse(event.data);
+        const data = JSON.parse(event.data);
+        const converted = converter ? converter(data) : data;
+
         this.subscribers.forEach(({ action, channel }) => {
-          const shouldEmit = this.pickChannel
-            ? channel && this.pickChannel(converted, channel)
+          const shouldEmit = pickChannel
+            ? channel && pickChannel(converted, channel)
             : true;
 
           if (shouldEmit) {
