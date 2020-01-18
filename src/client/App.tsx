@@ -1,8 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 
-import { TestPanel } from './components/TestPanel/TestPanel';
-import { Messages } from './features/Messages';
+import { Messages, TestPanel } from './MessagesFeature';
 import { store } from './store';
 import './App.scss';
 

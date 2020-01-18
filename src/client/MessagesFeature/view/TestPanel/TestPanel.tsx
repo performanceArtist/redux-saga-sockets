@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { autobind } from 'core-decorators';
 
-import { actions } from '../../lib/redux';
-import { startIO, startWebsocket } from '../../startSocket';
+import { actions } from '../../redux';
+import { actions as socketActions } from '../../../lib/redux';
+import { startIO, startWebsocket } from '../../../sockets';
 import { AppReduxState } from 'client/store';
 import './TestPanel.scss';
 
@@ -16,8 +17,8 @@ const mapState = (state: AppReduxState) => ({
   ...state.socket
 });
 
-const { startChannel, stopChannel } = actions;
-const mapDispatch = { startChannel, stopChannel };
+const { startChannel, stopChannel } = socketActions;
+const mapDispatch = { startChannel, stopChannel, ...actions };
 
 class TestPanel extends React.Component<Props, State> {
   public state: State = {
@@ -86,17 +87,47 @@ class TestPanel extends React.Component<Props, State> {
 
   @autobind
   private startChannel() {
-    const { stopChannel, startChannel, channelStatus } = this.props;
+    const {
+      stopChannel,
+      startChannel,
+      channelStatus,
+      subsribeToIO,
+      unsubsribeFromIO,
+      subsribeToWebsocket,
+      unsubsribeFromWebsocket
+     } = this.props;
     const { mode } = this.state;
 
     channelStatus === 'on' && stopChannel();
-    mode === 'websocket' ? startWebsocket() : startIO();
+
+    if (mode === 'io') {
+      startIO();
+      channelStatus === 'on' && unsubsribeFromWebsocket();
+      subsribeToIO();
+    } else {
+      startWebsocket();
+      channelStatus === 'on' && unsubsribeFromIO();
+      subsribeToWebsocket();
+    }
+
     startChannel();
   }
 
   @autobind
   private stopChannel() {
-    const { stopChannel } = this.props;
+    const { stopChannel, channelStatus, unsubsribeFromIO, unsubsribeFromWebsocket } = this.props;
+    const { mode } = this.state;
+
+    if (channelStatus !== 'on') {
+      return;
+    }
+
+    if (mode === 'io') {
+      unsubsribeFromIO();
+    } else {
+      unsubsribeFromWebsocket();
+    }
+
     stopChannel();
   }
 }

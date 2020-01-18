@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { AppReduxState } from '../../../../store';
+import { actions } from '../../redux';
+import { AppReduxState } from '../../../store';
 
 import './Messages.scss';
 
@@ -9,7 +10,21 @@ const mapState = (state: AppReduxState) => ({
   ...state.message
 });
 
-type Props = ReturnType<typeof mapState>;
+const {
+  subsribeToWebsocket,
+  unsubsribeFromWebsocket,
+  subsribeToIO,
+  unsubsribeFromIO
+} = actions;
+
+const mapDispatch = {
+  subsribeToWebsocket,
+  unsubsribeFromWebsocket,
+  subsribeToIO,
+  unsubsribeFromIO
+}
+
+type Props = ReturnType<typeof mapState> & typeof mapDispatch;
 
 class Messages extends React.Component<Props> {
   render() {
@@ -23,5 +38,5 @@ class Messages extends React.Component<Props> {
   }
 }
 
-const connectedComponent = connect(mapState)(Messages);
+const connectedComponent = connect(mapState, mapDispatch)(Messages);
 export { connectedComponent as Messages };
