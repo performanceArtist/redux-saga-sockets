@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { autobind } from 'core-decorators';
 
-import { actions } from '../../reduxSocket';
+import { actions } from '../../lib/redux';
 import { startIO, startWebsocket } from '../../startSocket';
 import { AppReduxState } from 'client/store';
 import './TestPanel.scss';

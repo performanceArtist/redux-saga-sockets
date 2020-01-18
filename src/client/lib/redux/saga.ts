@@ -8,7 +8,7 @@ import {
   race
 } from 'redux-saga/effects';
 
-import { Socket } from '../../socket';
+import { Socket } from '../core';
 import { actions } from './actions';
 
 const { serverOn, serverOff } = actions;

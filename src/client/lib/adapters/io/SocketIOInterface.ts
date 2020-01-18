@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import io from 'socket.io-client';
 import { autobind } from 'core-decorators';
 
-import { AnySocket } from '../socket';
+import { AnySocket } from '../../core';
 
 class SocketIOInterface<T, C extends string = never> implements AnySocket<T, C> {
   private socket!: SocketIOClient.Socket;

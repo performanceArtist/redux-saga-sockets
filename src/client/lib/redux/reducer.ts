@@ -1,4 +1,4 @@
-import { ReduxState } from '../namespace';
+import { ReduxState } from './namespace';
 
 import { initial } from './initial';
 import { Actions } from './actions';

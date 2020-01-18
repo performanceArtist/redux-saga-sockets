@@ -1,6 +1,6 @@
 import { actions } from './features/Messages/redux';
-import { SocketIOInterface } from './io';
-import { WebSocketInterface } from './websocket';
+import { SocketIOInterface } from './lib/adapters/io';
+import { WebSocketInterface } from './lib/adapters/websocket';
 import { socket } from './saga';
 import { SocketData, SocketChannel } from './socketTypes';
 

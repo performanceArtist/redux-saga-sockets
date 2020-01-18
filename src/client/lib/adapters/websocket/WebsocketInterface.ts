@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { autobind } from 'core-decorators';
 
-import { AnySocket } from '../socket';
+import { AnySocket } from '../../core';
 import { ReconnectableWebsocket } from './ReconnectableWebsocket';
 
 type PickChannel<T, C> = C extends never

@@ -1,4 +1,4 @@
-import { ReduxState } from '../namespace';
+import { ReduxState } from './namespace';
 
 export const initial: ReduxState = {
   channelStatus: 'off',
