@@ -6,11 +6,11 @@ export const serverOff = () => ({
   type: 'SOCKET:SERVER_OFF'
 } as const);
 
-export const startChannel = () => ({ type: 'SOCKET:START_CHANNEL' } as const);
-export const stopChannel = () => ({ type: 'SOCKET:STOP_CHANNEL' } as const);
+export const startListen = () => ({ type: 'SOCKET:START_LISTEN' } as const);
+export const stopListen = () => ({ type: 'SOCKET:STOP_LISTEN' } as const);
 
 type ActionCreators = { [key: string]: (...args: any) => object };
 type ActionTypes<T extends ActionCreators> = ReturnType<T[keyof T]>;
 
-export const actions = { serverOn, serverOff, startChannel, stopChannel };
+export const actions = { serverOn, serverOff, startListen, stopListen };
 export type Actions = ActionTypes<typeof actions>;

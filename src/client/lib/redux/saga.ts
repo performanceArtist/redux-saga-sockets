@@ -70,10 +70,10 @@ class SocketSaga {
   @autobind
   public* listen() {
     while (true) {
-      yield take('SOCKET:START_CHANNEL');
+      yield take('SOCKET:START_LISTEN');
       yield race({
         task: call(this.listenServerSaga),
-        cancel: take('SOCKET:STOP_CHANNEL'),
+        cancel: take('SOCKET:STOP_LISTEN'),
       });
     }
   }

@@ -8,6 +8,8 @@ export function subscribe<K extends SocketChannel>(channel: K, toAction: ToActio
     channel,
     toAction,
   );
+
+  return () => unsubscribe(channel, toAction);
 }
 
 export function unsubscribe<K extends SocketChannel>(channel: K, toAction: ToAction<ByChannel<K>>) {

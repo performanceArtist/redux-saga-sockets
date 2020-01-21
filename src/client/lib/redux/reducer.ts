@@ -5,9 +5,9 @@ import { Actions } from './actions';
 
 function reducer(state = initial, action: Actions): ReduxState {
   switch(action.type) {
-    case 'SOCKET:START_CHANNEL':
+    case 'SOCKET:START_LISTEN':
       return { ...state, channelStatus: 'on' };
-    case 'SOCKET:STOP_CHANNEL':
+    case 'SOCKET:STOP_LISTEN':
       return { ...state, channelStatus: 'off' };
     case 'SOCKET:SERVER_ON':
       return { ...state, serverStatus: 'on' };

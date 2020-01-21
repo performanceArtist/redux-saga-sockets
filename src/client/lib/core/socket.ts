@@ -19,6 +19,7 @@ class Socket<T, C = never> {
   private socket!: AnySocket<T, C>;
   private serverStatusEmitter = new EventEmitter();
   private lastServerStatus: 'on' | 'off' = 'off';
+  private subscribeBuffer: [ToAction<T>, C?][] = [];
   public onMessage?: AnySocket<T, C>['onMessage'];
   public offMessage?: AnySocket<T, C>['offMessage'];
 
@@ -27,15 +28,21 @@ class Socket<T, C = never> {
     this.socket = socket;
     this.onMessage = socket.onMessage;
     this.offMessage = socket.offMessage;
+    this.subscribeBuffer.forEach(pending => this.socket.subscribe(...pending));
+    this.subscribeBuffer = [];
   }
 
   public subscribe(makeAction: ToAction<T>): void
   public subscribe(channel: C, makeAction: ToAction<T>): void
   subscribe(a: ToAction<T> | C, b?: ToAction<T>) {
     if (typeof a === 'string' && b) {
-      this.socket.subscribe(b, a);
+      this.socket
+        ? this.socket.subscribe(b, a)
+        : this.subscribeBuffer.push([b, a]);
     } else {
-      this.socket.subscribe(a as ToAction<T>);
+      this.socket
+        ? this.socket.subscribe(a as ToAction<T>)
+        : this.subscribeBuffer.push([a as ToAction<T>]);
     }
   }
 
@@ -43,9 +50,17 @@ class Socket<T, C = never> {
   public unsubscribe(channel: C, makeAction: ToAction<T>): void
   unsubscribe(a: ToAction<T> | C, b?: ToAction<T>) {
     if (typeof a === 'string' && b) {
-      this.socket.unsubscribe(b, a);
+      this.socket
+        ? this.socket.unsubscribe(b, a)
+        : this.subscribeBuffer = this.subscribeBuffer.filter(
+          ([action, channel]) => action !== b && channel !== a
+        )
     } else {
-      this.socket.unsubscribe(a as ToAction<T>);
+      this.socket
+        ? this.socket.unsubscribe(a as ToAction<T>)
+        : this.subscribeBuffer = this.subscribeBuffer.filter(
+          ([action, channel]) => action !== a && !channel
+        )
     }
   }
 

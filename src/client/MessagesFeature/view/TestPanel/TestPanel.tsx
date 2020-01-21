@@ -17,8 +17,8 @@ const mapState = (state: AppReduxState) => ({
   ...state.socket
 });
 
-const { startChannel, stopChannel } = socketActions;
-const mapDispatch = { startChannel, stopChannel, ...actions };
+const { startListen, stopListen } = socketActions;
+const mapDispatch = { startListen, stopListen, ...actions };
 
 class TestPanel extends React.Component<Props, State> {
   public state: State = {
@@ -55,13 +55,13 @@ class TestPanel extends React.Component<Props, State> {
         <button
           type="button"
           className="test-panel__button"
-          onClick={this.startChannel}
+          onClick={this.startListen}
         >
           Start channel
         </button>
         <button
           className="test-panel__button"
-          type="button" onClick={this.stopChannel}
+          type="button" onClick={this.stopListen}
         >
           Stop channel
         </button>
@@ -82,14 +82,14 @@ class TestPanel extends React.Component<Props, State> {
     const target = event.target as HTMLInputElement;
     const mode = target.value as 'io' | 'websocket';
 
-    this.setState({ mode }, this.startChannel);
+    this.setState({ mode }, this.startListen);
   }
 
   @autobind
-  private startChannel() {
+  private startListen() {
     const {
-      stopChannel,
-      startChannel,
+      stopListen,
+      startListen,
       channelStatus,
       subsribeToIO,
       unsubsribeFromIO,
@@ -98,7 +98,7 @@ class TestPanel extends React.Component<Props, State> {
      } = this.props;
     const { mode } = this.state;
 
-    channelStatus === 'on' && stopChannel();
+    channelStatus === 'on' && stopListen();
 
     if (mode === 'io') {
       startIO();
@@ -110,12 +110,12 @@ class TestPanel extends React.Component<Props, State> {
       subsribeToWebsocket();
     }
 
-    startChannel();
+    startListen();
   }
 
   @autobind
-  private stopChannel() {
-    const { stopChannel, channelStatus, unsubsribeFromIO, unsubsribeFromWebsocket } = this.props;
+  private stopListen() {
+    const { stopListen, channelStatus, unsubsribeFromIO, unsubsribeFromWebsocket } = this.props;
     const { mode } = this.state;
 
     if (channelStatus !== 'on') {
@@ -128,7 +128,7 @@ class TestPanel extends React.Component<Props, State> {
       unsubsribeFromWebsocket();
     }
 
-    stopChannel();
+    stopListen();
   }
 }
 
