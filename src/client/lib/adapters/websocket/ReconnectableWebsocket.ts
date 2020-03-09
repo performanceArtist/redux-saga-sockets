@@ -1,25 +1,40 @@
 import { EventEmitter } from 'events';
 
+type ReconnectableWebsocketOptions = {
+  url: string;
+  reconnectTimeout?: number;
+  pingTimeout?: number;
+};
+
+const PING_MESSAGE = 'PING';
+
 class ReconnectableWebsocket {
   private websocket!: WebSocket;
   private reconnectInterval!: NodeJS.Timeout | null;
+  private pingInterval!: NodeJS.Timeout | null;
   private onMessageCallback!: (event: MessageEvent) => void;
   private connected = false;
   private emitter = new EventEmitter();
+  private options: Required<ReconnectableWebsocketOptions>;
 
-  constructor(private url: string, private reconnectTimeout = 3000) {}
+  constructor(options: ReconnectableWebsocketOptions) {
+    const { url, reconnectTimeout = 3000, pingTimeout = 3000 } = options;
+    this.options = { url, reconnectTimeout, pingTimeout };
+  }
 
   connect() {
     this.init(false);
   }
 
   disconnect() {
-    this.clearInterval();
+    this.clearReconnectInterval();
+    this.clearPingInterval();
     this.websocket.close();
   }
 
   unsubscribeMessageHandler() {
-    this.onMessageCallback && this.emitter.off('message', this.onMessageCallback);
+    this.onMessageCallback &&
+      this.emitter.off('message', this.onMessageCallback);
   }
 
   onConnect(callback: (event?: Event) => void) {
@@ -28,7 +43,10 @@ class ReconnectableWebsocket {
 
   onMessage(callback: (event: MessageEvent) => void) {
     this.onMessageCallback = callback;
-    this.emitter.on('message', callback);
+    this.emitter.on(
+      'message',
+      message => message !== PING_MESSAGE && callback(message),
+    );
   }
 
   onDisconnect(callback: (event?: CloseEvent) => void) {
@@ -41,7 +59,7 @@ class ReconnectableWebsocket {
 
   private init(isReconnect = false) {
     this.websocket && this.websocket.close();
-    this.websocket = new WebSocket(this.url);
+    this.websocket = new WebSocket(this.options.url);
 
     this.websocket.addEventListener('error', event => {
       this.connected && this.emitter.emit('disconnect', event);
@@ -64,8 +82,12 @@ class ReconnectableWebsocket {
         : this.emitter.emit('connect', event);
 
       this.connected = true;
-      this.reconnectInterval && clearInterval(this.reconnectInterval);
-      this.reconnectInterval = null;
+      this.clearReconnectInterval();
+      this.clearPingInterval();
+      this.pingInterval = setInterval(
+        () => this.emitter.emit('message', PING_MESSAGE),
+        this.options.pingTimeout,
+      );
 
       this.websocket.addEventListener('message', messageEvent => {
         this.emitter.emit('message', messageEvent);
@@ -73,13 +95,21 @@ class ReconnectableWebsocket {
     });
   }
 
-  private clearInterval() {
+  private clearReconnectInterval() {
     this.reconnectInterval && clearInterval(this.reconnectInterval);
     this.reconnectInterval = null;
   }
 
+  private clearPingInterval() {
+    this.pingInterval && clearInterval(this.pingInterval);
+    this.pingInterval = null;
+  }
+
   private reconnect() {
-    if (this.reconnectInterval || this.websocket.readyState === WebSocket.OPEN) {
+    if (
+      this.reconnectInterval ||
+      this.websocket.readyState === WebSocket.OPEN
+    ) {
       return;
     }
 
@@ -87,7 +117,10 @@ class ReconnectableWebsocket {
       this.init(true);
     };
 
-    this.reconnectInterval = setInterval(tryToReconnect, this.reconnectTimeout);
+    this.reconnectInterval = setInterval(
+      tryToReconnect,
+      this.options.reconnectTimeout,
+    );
   }
 }
 

@@ -27,7 +27,7 @@ class WebSocketInterface<T, C = never> implements AnySocket<T, C> {
   constructor(private options: Options<T, C>) {
     const { url } = this.options;
 
-    this.websocket = new ReconnectableWebsocket(url);
+    this.websocket = new ReconnectableWebsocket({ url });
   }
 
   @autobind
